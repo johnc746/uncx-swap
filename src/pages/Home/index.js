@@ -174,7 +174,7 @@ const Home = () => {
                     >
                         Lock Liquidity on which exchange?
                     </Typography>
-                    <Link href='/pair' underline="none">
+                    {/* <Link href='/pair' underline="none"> */}
                         <Box
                             className='d-flex align-items-center mb-1'
                             sx={{
@@ -205,7 +205,7 @@ const Home = () => {
                                 </Typography>
                             </Box>
                         </Box>
-                    </Link>
+                    {/* </Link> */}
                     <Box
                         className='d-flex align-items-center mb-2'
                         sx={{
