@@ -3,7 +3,7 @@ import { Box, Container, Link, Modal, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { Image, MidIcon, SmallIcon } from './style';
+import { SmallIcon } from './style';
 
 const Pair = () => {
     return (
