@@ -8,13 +8,13 @@ import { createTheme, ThemeProvider } from '@mui/material';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1e2023',
+      main: '#122155',
       text: '#fafafa',
       title: '#b9babb',
-      hotColor: '#18191c',
-      hoverColor: '#22272c',
-      outline: '#363636',
-      dark: '#151617',
+      hotColor: '#0d173a',
+      hoverColor: '#07317e6f',
+      outline: '#07317e',
+      dark: '#0d173a',
       green: '#68d67c',
     }
   },

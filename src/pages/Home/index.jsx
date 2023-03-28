@@ -7,39 +7,15 @@ import { Image, MidIcon, SmallIcon } from './style';
 
 const chainList = [
     {
-        name: 'Ethereum',
-        icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
-    },
-    {
-        name: 'DogeChain',
-        icon: 'https://docs.dogechain.dog/img/logo.png'
-    },
-    {
-        name: 'Binance Smart Chain',
-        icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c/logo.png'
-    },
-    {
-        name: 'xDai',
-        icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x0Ae055097C6d159879521C384F1D2123D1f195e6/logo.png'
-    },
-    {
-        name: 'Polygon',
-        icon: 'https://res.cloudinary.com/sushi-cdn/image/fetch/w_64,f_auto,q_auto,fl_sanitize/https://raw.githubusercontent.com/sushiswap/logos/main/token/polygon.jpg'
-    },
-    {
-        name: 'Avalanche',
-        icon: 'https://cryptologos.cc/logos/avalanche-avax-logo.png'
-    },
-    {
-        name: 'Arbitrum One',
-        icon: 'https://arbitrum.io/wp-content/uploads/2022/12/One-Logo-280x280-1.png'
-    },
+        name: 'ZKsync',
+        icon: 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F451300809%2F1144705849263%2F1%2Foriginal.20230221-185620?w=400&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C400%2C400&s=6be70815fc7d7b0da0ed6d53c81cdd68'
+    }
 ]
 
 const Home = () => {
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    // const [open, setOpen] = useState(false);
+    // const handleOpen = () => setOpen(true);
+    // const handleClose = () => setOpen(false);
 
     return (
         <Container className='d-flex align-items-center justify-content-center'
@@ -56,7 +32,7 @@ const Home = () => {
                 }}
             >
                 <Link
-                    href='https://defillama.com/protocol/unicrypt'
+                    href='https://app.mute.io/'
                     target='_blank'
                     underline="none"
                 >
@@ -99,7 +75,7 @@ const Home = () => {
                                     fontSize: '12px'
                                 }}
                             >
-                                View our Liquidity Locker TVL on Defi Liama
+                                View our Liquidity Locker TVL on Mute Switch
                             </Typography>
                         </Box>
                     </Box>
@@ -125,7 +101,7 @@ const Home = () => {
                         Selected network
                     </Typography>
                     <Box
-                        onClick={handleOpen}
+                        // onClick={handleOpen}
                         className='d-flex align-items-center'
                         sx={{
                             boxShadow: '0 5.40728px 10.8146px rgba(0,0,0,.3)',
@@ -138,8 +114,8 @@ const Home = () => {
                         }}
                     >
                         <MidIcon
-                            src='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
-                            alt="Ethereum"
+                            src='https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F451300809%2F1144705849263%2F1%2Foriginal.20230221-185620?w=400&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C400%2C400&s=6be70815fc7d7b0da0ed6d53c81cdd68'
+                            alt="ZKsync"
                             className='me-3'
                         />
                         <Box className='d-flex align-items-center'>
@@ -150,7 +126,7 @@ const Home = () => {
                                     fontWeight: '500',
                                 }}
                             >
-                                Ethereum
+                                ZKsync
                             </Typography>
                             <ExpandMoreIcon
                                 fontSize="small"
@@ -174,7 +150,7 @@ const Home = () => {
                     >
                         Lock Liquidity on which exchange?
                     </Typography>
-                    {/* <Link href='/pair' underline="none"> */}
+                    <Link href='/pair' underline="none">
                         <Box
                             className='d-flex align-items-center mb-1'
                             sx={{
@@ -189,9 +165,12 @@ const Home = () => {
                             }}
                         >
                             <SmallIcon
-                                src='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png'
-                                alt="Ethereum"
+                                src='https://pbs.twimg.com/profile_images/1600140648392400900/PL8aonbi_400x400.jpg'
+                                alt="Mute Switch"
                                 className='me-3'
+                                sx={{
+                                    borderRadius: '5px'
+                                }}
                             />
                             <Box className='d-flex align-items-center'>
                                 <Typography
@@ -201,44 +180,14 @@ const Home = () => {
                                         fontWeight: '500',
                                     }}
                                 >
-                                    Uniswap V2
+                                    Mute Switch
                                 </Typography>
                             </Box>
                         </Box>
-                    {/* </Link> */}
-                    <Box
-                        className='d-flex align-items-center mb-2'
-                        sx={{
-                            backgroundColor: 'primary.main',
-                            boxShadow: '0 5.40728px 10.8146px rgba(0,0,0,.3)',
-                            borderRadius: '20px',
-                            padding: '16px',
-                            cursor: 'pointer',
-                            '&:hover': {
-                                backgroundColor: 'primary.hoverColor',
-                            }
-                        }}
-                    >
-                        <SmallIcon
-                            src='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B3595068778DD592e39A122f4f5a5cF09C90fE2/logo.png'
-                            alt="Ethereum"
-                            className='me-3'
-                        />
-                        <Box className='d-flex align-items-center'>
-                            <Typography
-                                color='primary.text'
-                                sx={{
-                                    fontSize: '16px',
-                                    fontWeight: '500',
-                                }}
-                            >
-                                Sushiswap V1
-                            </Typography>
-                        </Box>
-                    </Box>
+                    </Link>
                 </Box>
             </Box>
-            <Modal
+            {/* <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
@@ -298,6 +247,7 @@ const Home = () => {
                         chainList.map((item, index) => {
                             return (
                                 <Box
+                                    key={index}
                                     className='d-flex align-items-center px-3'
                                     sx={{
                                         backgroundColor: 'primary.main',
@@ -373,7 +323,7 @@ const Home = () => {
                         </Box>
                     </Box>
                 </Box>
-            </Modal>
+            </Modal> */}
         </Container >
     );
 };
