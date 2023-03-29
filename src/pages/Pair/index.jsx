@@ -11,6 +11,7 @@ const Pair = () => {
     const [inputAddress, setInputAddress] = useState("");
 
     useEffect(() => {
+        console.log('account', account);
         if (status === "notConnected" || status === "initializing") {
             setConnectStatus("Connect Wallet");
         } else if (status === "connected") {
