@@ -165,7 +165,7 @@ const Home = () => {
                             }}
                         >
                             <SmallIcon
-                                src='https://pbs.twimg.com/profile_images/1600140648392400900/PL8aonbi_400x400.jpg'
+                                src='https://testnet.switch.mute.io/icon.png'
                                 alt="Mute Switch"
                                 className='me-3'
                                 sx={{

@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { Box, Container, TextField, Link, Modal, Typography, Button } from '@mui/material';
 import { SmallIcon } from './style';
+import { useMetaMask } from "metamask-react";
 
 const ariaLabel = { 'aria-label': 'description' };
 
 const Pair = () => {
+    const { status, connect, account, chainId, ethereum } = useMetaMask();
+
+    useEffect(() => {
+        console.log("status", status);
+        if (status === "connected") {
+            console.log("account", account);
+        }
+    }, [status])
+
     return (
         <Container className='d-flex align-items-center justify-content-center'
             sx={{ height: '100vh' }}>
@@ -22,7 +32,7 @@ const Pair = () => {
                     className='d-flex align-items-center mb-3'
                 >
                     <SmallIcon
-                        src="https://pbs.twimg.com/profile_images/1600140648392400900/PL8aonbi_400x400.jpg"
+                        src="https://testnet.switch.mute.io/icon.png"
                         alt='Mute.Switch'
                         className='me-3'
                         sx={{ borderRadius: '50%' }}
@@ -119,9 +129,13 @@ const Pair = () => {
                                 backgroundColor: '#68d67c20'
                             }
                         }}
+                        onClick={connect}
                     >
-                        Connect Wallet
+                        {/* {state.loading ? status : "Connect Wallet"} */}
+                        {status}
                     </Button>
+            {/* <Button type="submit" label={state.loading ? status : "Login with Wallet"} disabled={(state.loading)} onClick={connect}/>
+            <div className="server-error">{state.error && state.error}</div> */}
                 </Box>
             </Box>
         </Container>

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import { MetaMaskProvider } from "metamask-react";
 import App from './App';
 import { createTheme, ThemeProvider } from '@mui/material';
 
@@ -26,8 +27,10 @@ const theme = createTheme({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <MetaMaskProvider>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </MetaMaskProvider>
   </React.StrictMode>
 );
