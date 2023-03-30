@@ -2,8 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { Box, Container, TextField, Link, Modal, Typography, Button } from '@mui/material';
 import { SmallIcon } from './style';
 import { useMetaMask } from "metamask-react";
+import { tokens } from 'zksync';
 
 const ariaLabel = { 'aria-label': 'description' };
+
+async function findPairedToken(symbol) {
+    const allTokens = await tokens.getTokens();
+    const token = allTokens.find((t) => t.symbol === symbol);
+    if (!token) {
+        throw new Error(`Token ${symbol} not found`);
+    }
+    const pair = allTokens.find((t) => t.id === token.pair_id);
+    if (!pair) {
+        throw new Error(`Pair for token ${symbol} not found`);
+    }
+    return pair;
+}
 
 const Pair = () => {
     const { status, connect, account, chainId, ethereum } = useMetaMask();
@@ -11,6 +25,12 @@ const Pair = () => {
     const [inputAddress, setInputAddress] = useState("");
 
     useEffect(() => {
+        findPairedToken('ETH').then((pair) => {
+            console.kelog(`Paired token for ETH: ${pair.symbol}`);
+        }).catch((err) => {
+            console.error("EEEEEE>>>", err);
+        });
+
         console.log('account', account);
         if (status === "notConnected" || status === "initializing") {
             setConnectStatus("Connect Wallet");
