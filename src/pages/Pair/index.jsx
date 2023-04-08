@@ -25,19 +25,33 @@ const ariaLabel = { 'aria-label': 'description' };
 // }
 
 const token_img = [
-    { symbol: "eth", address: "0x0000000000000000000000000000000000000000", url: "https://explorer.zksync.io/images/currencis/eth.svg" },
-    { symbol: "mute", address: "0x0e97C7a0F8B2C9885C8ac9fC6136e829CbC21d42", url: "https://explorer.zksync.io/images/currencis/mute.svg" },
-    { symbol: "usdc", address: "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4", url: "https://explorer.zksync.io/images/currencis/usdc.svg" },
+    { symbol: "eth", address: "0x0000000000000000000000000000000000000000", url: "https://explorer.zksync.io/images/currencies/eth.svg" },
+    { symbol: "mute", address: "0x0e97C7a0F8B2C9885C8ac9fC6136e829CbC21d42", url: "https://explorer.zksync.io/images/currencies/mute.svg" },
+    { symbol: "usdc", address: "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4", url: "https://explorer.zksync.io/images/currencies/usdc.svg" },
 ];
 
 const nettype = 'mainnet';
+
+const tokenImage = (tokenaddress) => {
+    switch (tokenaddress) {
+        case "0x0000000000000000000000000000000000000000":
+            return "https://explorer.zksync.io/images/currencies/eth.svg";
+        case "0x0e97C7a0F8B2C9885C8ac9fC6136e829CbC21d42":
+            return "https://explorer.zksync.io/images/currencies/mute.svg";
+        case "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4":
+            return "https://explorer.zksync.io/images/currencies/usdc.svg";
+        default:
+            return "https://explorer.zksync.io/images/currencies/customToken.svg";
+    }
+    
+}
 
 const Pair = () => {
     const { status, connect, account, chainId, ethereum } = useMetaMask();
     const [connectStatus, setConnectStatus] = useState("");
     const [inputAddress, setInputAddress] = useState("");
 
-    const [allPairs, setAllPairs] = useState([]);
+    // const [allPairs, setAllPairs] = useState([]);
 
     const [showPair, setShowPair] = useState();
     const [showPairInfo, setShowPairInfo] = useState();
@@ -89,7 +103,7 @@ const Pair = () => {
     useEffect(() => {
 
         console.log(mute_factory_abi);
-        readPairs();
+        // readPairs();
 
         console.log('account', account);
         if (status === "notConnected" || status === "initializing") {
@@ -104,41 +118,31 @@ const Pair = () => {
     }, [status])
 
     const onChangeAddress = async (e) => {
-        
+
         let address = e.target.value;
 
         console.log("onChange", address)
 
-        if (address != "") {
+        try {
+            const pair_contract = getWeb3Contract(pair_abi, address)
 
-            let temp_pair = allPairs.filter((pair) => {
-                if (pair == address) return true;
-                return false;
-            })
+            let pair_name = await pair_contract.methods
+                .name()
+                .call()
 
-            if (temp_pair.length > 0) {
+            let token0 = await pair_contract.methods
+                .token0()
+                .call()
 
-                const pair_contract = getWeb3Contract(pair_abi, temp_pair[0])
+            let token1 = await pair_contract.methods
+                .token1()
+                .call()
 
-                let pair_name = await pair_contract.methods
-                    .name()
-                    .call()
-
-                let token0 = await pair_contract.methods
-                    .token0()
-                    .call()
-
-                let token1 = await pair_contract.methods
-                    .token1()
-                    .call()
-
-                setShowPairInfo({ name: pair_name, token0, token1 });
-            } else {
-                setShowPairInfo();
-            }
-        } else {
+            setShowPairInfo({ name: pair_name, token0, token1 });
+        } catch (error) {
             setShowPairInfo();
         }
+
         setInputAddress(address);
     }
 
@@ -273,13 +277,7 @@ const Pair = () => {
                             <Box className='d-flex align-items-center'>
                                 <Box>
                                     <SmallIcon
-                                        src={token_img.filter((token) => {
-                                            if (token.address == showPairInfo.token0) return true;
-                                            return false;
-                                        }).length > 0 ? token_img.filter((token) => {
-                                            if (token.address == showPairInfo.token0) return true;
-                                            return false;
-                                        })[0] : "https://explorer.zksync.io/images/currencies/customToken.svg"}
+                                        src={tokenImage(showPairInfo.token0)}
                                         alt=''
                                         sx={{ borderRadius: '50%' }}
                                     />
@@ -333,11 +331,8 @@ const Pair = () => {
                             CONTINUE
                         </Button>
                     </Box>
-                    :<></>}
-                    <Box sx={{ display: 'flex' }}>
-                        {loadingFlag ? <CircularProgress /> : <></>}
-                    </Box>
-                
+                    : <></>
+                }
             </Box>
         </Container>
     );
