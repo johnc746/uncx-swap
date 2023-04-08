@@ -30,7 +30,7 @@ const token_img = [
     { symbol: "usdc", address: "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4", url: "https://explorer.zksync.io/images/currencis/usdc.svg" },
 ];
 
-const nettype = 'testnet';
+const nettype = 'mainnet';
 
 const Pair = () => {
     const { status, connect, account, chainId, ethereum } = useMetaMask();
@@ -333,11 +333,11 @@ const Pair = () => {
                             CONTINUE
                         </Button>
                     </Box>
-                    :
+                    :<></>}
                     <Box sx={{ display: 'flex' }}>
                         {loadingFlag ? <CircularProgress /> : <></>}
                     </Box>
-                }
+                
             </Box>
         </Container>
     );
