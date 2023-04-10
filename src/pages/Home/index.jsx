@@ -165,7 +165,7 @@ const Home = () => {
                             }}
                         >
                             <SmallIcon
-                                src='https://testnet.switch.mute.io/icon.png'
+                                src='https://explorer.zksync.io/images/currencies/mute.svg'
                                 alt="Mute Switch"
                                 className='me-3'
                                 sx={{
