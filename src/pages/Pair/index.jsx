@@ -13,8 +13,18 @@ import { lock_abi, lock_address_mainnet } from '../../contract/lock';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
+import { useWeb3React } from "@web3-react/core";
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { ethers } from "ethers";
+
+import { toast } from 'react-toastify';
+
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
+
+const Injected = new InjectedConnector({
+    supportedChainIds: [zksync_mainnet_chainid, zksync_testnet_chainid]
+});
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -34,7 +44,8 @@ const tokenImage = (tokenaddress) => {
 }
 
 const Pair = () => {
-    const { status, connect, account, chainId, ethereum } = useMetaMask();
+    const { account, library, activate, deactivate } = useWeb3React();
+
     const [connectStatus, setConnectStatus] = useState("");
     const [inputAddress, setInputAddress] = useState("");
     const [balance, setBalance] = useState(0);
@@ -64,59 +75,48 @@ const Pair = () => {
         return new web3.eth.Contract(abi, address);
     }
 
-    useEffect(() => {
-
-        const timeId = setInterval(async () => {
-            try {
-
-                let web3 = getWeb3();
-                console.log("connectStatus:", connectStatus);
-                if (connectStatus != "") {
-                    let eth_balance = await web3.eth.getBalance(account);
-                    console.log("eth:", eth_balance);
-                    setEthBalance(web3.utils.fromWei(eth_balance, 'ether'));
-                }
-                if (showPairInfo) {
-
-                    const pair_contract = getWeb3Contract(pair_abi, inputAddress)
-
-                    let lp_balance = await pair_contract.methods
-                        .balanceOf(account)
-                        .call()
-
-                    setBalance(web3.utils.fromWei(lp_balance, 'ether'));
-                }
-                if (step != "select_pair") {
-
-                    const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
-
-                    let lock_fee = await lock_contract.methods
-                        .getFeesInETH(inputAddress)
-                        .call()
-
-                    console.log("lock_fee:", lock_fee)
-                    setFee(web3.utils.fromWei(lock_fee, 'ether'));
-
-                    if (unlockOwner == "Me") setUnlockerAddress(account);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }, 10000);
-    }, [])
+    const getContract = (abi, address, library) => {
+        try {
+            return new ethers.Contract(address, abi, library.getSigner());
+        } catch {
+            return false;
+        }
+    };
 
     useEffect(() => {
-
-        console.log("status:", status);
-        if (status === "notConnected" || status === "initializing") {
-            setConnectStatus("Connect Wallet");
-        } else if (status === "connected") {
+        console.log("account:", account);
+        if (account == undefined || account == "") {
+            setConnectStatus("");
+        } else {
             setConnectStatus(account);
+            getEthBalance(account);
         }
-        else {
-            setConnectStatus(status);
-        }
-    }, [status])
+    }, [account])
+
+    const getEthBalance = async (account) => {
+        let web3 = getWeb3();
+        let eth_balance = await web3.eth.getBalance(account);
+        setEthBalance(web3.utils.fromWei(eth_balance, 'ether'));
+    }
+
+    const onContinue = async () => {
+        setStep("lock");
+
+        let web3 = getWeb3();
+
+        const pair_contract = getWeb3Contract(pair_abi, inputAddress)
+        let lp_balance = await pair_contract.methods
+            .balanceOf(account)
+            .call()
+        setBalance(web3.utils.fromWei(lp_balance, 'ether'));
+
+        const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
+        let lock_fee = await lock_contract.methods
+            .getFeesInETH(inputAddress)
+            .call()
+        setFee(web3.utils.fromWei(lock_fee, 'ether'));
+        if (unlockOwner == "Me") setUnlockerAddress(account);
+    }
 
     const onChangeAddress = async (e) => {
 
@@ -159,13 +159,37 @@ const Pair = () => {
         let web3 = getWeb3();
         try {
 
-            const pair_contract = getWeb3Contract(pair_abi, inputAddress)
+            const pair_contract = getContract(pair_abi, inputAddress, library);
 
-            await pair_contract.methods
-                .approve(lock_address_mainnet, web3.utils.toWei(balance, 'ether'))
-                .send({ from: account })
+            console.log("approve:", lock_address_mainnet, web3.utils.toWei(balance, 'ether'), account)
+
+            let tx = await pair_contract.approve(lock_address_mainnet, web3.utils.toWei(balance, 'ether'), { from: account });
+
+            const resolveAfter3Sec = new Promise((resolve) =>
+                setTimeout(resolve, 20000)
+            );
+
+            toast.promise(resolveAfter3Sec, {
+                pending: "Waiting for confirmation 👌",
+            });
+
+            var interval = setInterval(async function () {
+                let web3 = getWeb3();
+                var response = await web3.eth.getTransactionReceipt(tx.hash);
+                if (response !== null) {
+                    if (response.status === true) {
+                        clearInterval(interval);
+                        toast.success("Success ! your last transaction is success 👍");
+                    } else if (response.status === false) {
+                        clearInterval(interval);
+                        toast.error("Error ! Your last transaction is failed.");
+                    } else {
+                    }
+                }
+            }, 5000);
         } catch (error) {
-            console.error(error);
+            toast.error("Error ! Something went wrong.");
+            console.log(error);
         }
 
     }
@@ -175,14 +199,16 @@ const Pair = () => {
 
         const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
 
+        console.log("lock...", inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
+
         await lock_contract.methods
-            .lockToken(inputAddress, unlockOwner, web3.utils.toWei(lockAmount, 'ether'), lockTime, false)
+            .lockToken(inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
             .call()
     }
 
     return (
         <Container className='d-flex align-items-center justify-content-center'
-            sx={{ height: `${step == "select_pair" ? '100vh' : '230vh'}` }}>
+            sx={{ height: `${step == "select_pair" ? '100vh' : '140vh'}` }}>
             {step == "select_pair" ?
                 <Box
                     sx={{
@@ -255,9 +281,9 @@ const Pair = () => {
                                         backgroundColor: '#68d67c20'
                                     }
                                 }}
-                                onClick={connect}
+                                onClick={(e) => { activate(Injected) }}
                             >
-                                {connectStatus}
+                                Connect Wallet
                             </Button>
                         </Box>
                         :
@@ -380,10 +406,7 @@ const Pair = () => {
                                                     backgroundColor: '#68d67c5f'
                                                 }
                                             }}
-                                            onClick={(e) => {
-                                                setStep("lock");
-
-                                            }}
+                                            onClick={onContinue}
                                         >
                                             CONTINUE
                                         </Button>
@@ -510,7 +533,7 @@ const Pair = () => {
                                 Balance: {balance}
                             </Typography>
                             <Box className='d-flex justify-content-between align-items-center'>
-                                <Typography
+                                {/* <Typography
                                     variant='h4'
                                     color='primary.text'
                                     sx={{
@@ -519,7 +542,28 @@ const Pair = () => {
                                     }}
                                 >
                                     {lockAmount}
-                                </Typography>
+                                </Typography> */}
+                                <TextField placeholder="0" inputProps={ariaLabel} focused
+                                    onChange={(e) => { setLockAmount(e.target.value) }}
+                                    sx={{
+                                        width: '100%',
+                                        backgroundColor: 'primary.dark',
+                                        borderRadius: '18px',
+                                        marginTop: '10px',
+                                        padding: '0px',
+                                        input: {
+                                            color: 'primary.text',
+                                            paddingBottom: '12px',
+                                            paddingTop: '12px',
+                                            fontSize: '14px'
+                                        },
+
+                                        fieldSet: {
+                                            border: 'none'
+                                        }
+                                    }}
+                                    value={lockAmount}
+                                />
                                 <Box className='d-flex align-items-center'>
                                     <Typography
                                         variant='h4'
