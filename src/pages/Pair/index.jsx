@@ -792,6 +792,7 @@ const Pair = () => {
                                             position: 'absolute',
                                             right: '-350px',
                                         }}
+                                        onChange={(value) => {setLockTime(value)}}
                                         value={lockTime}
                                         onAccept={(value) => { setLockTime(value); setOpenCalender(false); }}
                                         onClose={() => { setOpenCalender(false); }}
