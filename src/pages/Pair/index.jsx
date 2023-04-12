@@ -212,10 +212,12 @@ const Pair = () => {
 
             const lock_contract = getContract(lock_abi, lock_address_mainnet, library);
 
-            console.log("lock...", inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false)
+            console.log("lock...", inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), web3.utils.toWei(fee, 'ether'), false)
 
-            let tx = await lock_contract.lockToken(inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false, { from: account });
+            let tx = await lock_contract.lockToken(inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false, { value: web3.utils.toWei(fee, 'ether')});
 
+
+            console.log("tx:", tx.hash)
             const resolveAfter3Sec = new Promise((resolve) =>
                 setTimeout(resolve, 20000)
             );

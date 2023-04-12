@@ -1,4 +1,4 @@
-export const lock_address_mainnet = "0x5657043c30180E49A9dAEF0cFeC7E30363CFEAee";
+export const lock_address_mainnet = "0x689eEBd0F0b2b6cC913e9a1fbd34cBC9c20F6935";
 export const lock_abi = [
     {
         "anonymous": false,
