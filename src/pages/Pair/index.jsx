@@ -161,6 +161,8 @@ const Pair = () => {
 
             const pair_contract = getContract(pair_abi, inputAddress, library);
 
+            console.log(balance);
+
             console.log("approve:", lock_address_mainnet, web3.utils.toWei(balance, 'ether'), account)
 
             let tx = await pair_contract.approve(lock_address_mainnet, web3.utils.toWei(balance, 'ether'), { from: account });
@@ -195,15 +197,51 @@ const Pair = () => {
     }
 
     const onLock = async () => {
+        // let web3 = getWeb3();
+
+        // const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
+
+        // console.log("lock...", inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
+
+        // await lock_contract.methods
+        //     .lockToken(inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
+        //     .call()
+
         let web3 = getWeb3();
+        try {
 
-        const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
+            const lock_contract = getContract(lock_abi, lock_address_mainnet, library);
 
-        console.log("lock...", inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
+            console.log("lock...", inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false)
 
-        await lock_contract.methods
-            .lockToken(inputAddress, unlockerAddress, web3.utils.toWei(lockAmount, 'ether'), lockTime.unix(), false)
-            .call()
+            let tx = await lock_contract.lockToken(inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false, { from: account });
+
+            const resolveAfter3Sec = new Promise((resolve) =>
+                setTimeout(resolve, 20000)
+            );
+
+            toast.promise(resolveAfter3Sec, {
+                pending: "Waiting for confirmation 👌",
+            });
+
+            var interval = setInterval(async function () {
+                let web3 = getWeb3();
+                var response = await web3.eth.getTransactionReceipt(tx.hash);
+                if (response !== null) {
+                    if (response.status === true) {
+                        clearInterval(interval);
+                        toast.success("Success ! your last transaction is success 👍");
+                    } else if (response.status === false) {
+                        clearInterval(interval);
+                        toast.error("Error ! Your last transaction is failed.");
+                    } else {
+                    }
+                }
+            }, 5000);
+        } catch (error) {
+            toast.error("Error ! Something went wrong.");
+            console.log(error);
+        }
     }
 
     return (
