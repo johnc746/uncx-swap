@@ -64,6 +64,7 @@ const Pair = () => {
     const [referralBalance, setReferralBalance] = useState(0);
     const [fee, setFee] = useState(0);
 
+    const [approvedBalance, setApprovedBalance] = useState(0);
     const [ethBalance, setEthBalance] = useState(0);
 
     const getWeb3 = () => {
@@ -109,6 +110,13 @@ const Pair = () => {
             .balanceOf(account)
             .call()
         setBalance(web3.utils.fromWei(lp_balance, 'ether'));
+
+        let approved_balance = await pair_contract.methods
+            .allowance(account, lock_address_mainnet)
+            .call()
+
+        console.log("approved_balance:", approved_balance)
+        setApprovedBalance(web3.utils.fromWei(approved_balance, 'ether'));
 
         const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
         let lock_fee = await lock_contract.methods
@@ -182,6 +190,8 @@ const Pair = () => {
                     if (response.status === true) {
                         clearInterval(interval);
                         toast.success("Success ! your last transaction is success 👍");
+                        console.log("approve_tx:", tx);
+                        setApprovedBalance(balance);
                     } else if (response.status === false) {
                         clearInterval(interval);
                         toast.error("Error ! Your last transaction is failed.");
@@ -214,7 +224,7 @@ const Pair = () => {
 
             console.log("lock...", inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), web3.utils.toWei(fee, 'ether'), false)
 
-            let tx = await lock_contract.lockToken(inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false, { value: web3.utils.toWei(fee, 'ether')});
+            let tx = await lock_contract.lockToken(inputAddress, unlockerAddress, (Math.floor(web3.utils.toWei(lockAmount, 'kether') / 1000)).toString(), lockTime.unix(), false, { value: web3.utils.toWei(fee, 'ether') });
 
 
             console.log("tx:", tx.hash)
@@ -792,7 +802,7 @@ const Pair = () => {
                                             position: 'absolute',
                                             right: '-350px',
                                         }}
-                                        onChange={(value) => {setLockTime(value)}}
+                                        onChange={(value) => { setLockTime(value) }}
                                         value={lockTime}
                                         onAccept={(value) => { setLockTime(value); setOpenCalender(false); }}
                                         onClose={() => { setOpenCalender(false); }}
@@ -1074,39 +1084,40 @@ const Pair = () => {
                         Once tokens are locked they cannot be withdrawn under any circumstances until the timer has expired. Please ensure the parameters are correct, as they are final.
                     </Typography>
                     <Box className='d-flex justify-content-center mb-3'>
-                        <Button
-                            className='w-50 me-2'
-                            sx={{
-                                height: '50px',
-                                backgroundColor: 'primary.green',
-                                borderRadius: '5px',
-                                color: 'white',
-                                '&:hover': {
-                                    backgroundColor: '#68d67c5f'
-                                }
-                            }}
-                            disabled={ethBalance >= fee ? false : true}
-                            onClick={onApprove}
-                        >
-                            Approve
-                        </Button>
-                        <Button
-                            className='w-50'
-                            sx={{
-                                height: '50px',
-                                backgroundColor: 'primary.green',
-                                borderRadius: '5px',
-                                color: 'white',
-                                '&:hover': {
-                                    backgroundColor: '#68d67c5f'
-                                }
-                            }}
-                            disabled={ethBalance >= fee ? false : true}
-                            onClick={onLock}
-                        >
-                            Lock
-                        </Button>
-
+                        {approvedBalance < lockAmount ?
+                            <Button
+                                className='w-50 me-2'
+                                sx={{
+                                    height: '50px',
+                                    backgroundColor: 'primary.green',
+                                    borderRadius: '5px',
+                                    color: 'white',
+                                    '&:hover': {
+                                        backgroundColor: '#68d67c5f'
+                                    }
+                                }}
+                                disabled={ethBalance >= fee ? false : true}
+                                onClick={onApprove}
+                            >
+                                Approve
+                            </Button> :
+                            <Button
+                                className='w-50'
+                                sx={{
+                                    height: '50px',
+                                    backgroundColor: 'primary.green',
+                                    borderRadius: '5px',
+                                    color: 'white',
+                                    '&:hover': {
+                                        backgroundColor: '#68d67c5f'
+                                    }
+                                }}
+                                disabled={ethBalance >= fee ? false : true}
+                                onClick={onLock}
+                            >
+                                Lock
+                            </Button>
+                        }
                     </Box>
                     {ethBalance < fee ?
                         <Box
