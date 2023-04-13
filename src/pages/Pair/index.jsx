@@ -111,12 +111,7 @@ const Pair = () => {
             .call()
         setBalance(web3.utils.fromWei(lp_balance, 'ether'));
 
-        let approved_balance = await pair_contract.methods
-            .allowance(account, lock_address_mainnet)
-            .call()
-
-        console.log("approved_balance:", approved_balance)
-        setApprovedBalance(web3.utils.fromWei(approved_balance, 'ether'));
+        await checkApprovedBalance();
 
         const lock_contract = getWeb3Contract(lock_abi, lock_address_mainnet)
         let lock_fee = await lock_contract.methods
@@ -124,6 +119,19 @@ const Pair = () => {
             .call()
         setFee(web3.utils.fromWei(lock_fee, 'ether'));
         if (unlockOwner == "Me") setUnlockerAddress(account);
+    }
+
+    const checkApprovedBalance = async () => {
+
+        let web3 = getWeb3();
+        const pair_contract = getWeb3Contract(pair_abi, inputAddress)
+        
+        let approved_balance = await pair_contract.methods
+            .allowance(account, lock_address_mainnet)
+            .call()
+
+        console.log("approved_balance:", approved_balance)
+        setApprovedBalance(web3.utils.fromWei(approved_balance, 'ether'));
     }
 
     const onChangeAddress = async (e) => {
@@ -190,8 +198,7 @@ const Pair = () => {
                     if (response.status === true) {
                         clearInterval(interval);
                         toast.success("Success ! your last transaction is success 👍");
-                        console.log("approve_tx:", tx);
-                        setApprovedBalance(balance);
+                        checkApprovedBalance();
                     } else if (response.status === false) {
                         clearInterval(interval);
                         toast.error("Error ! Your last transaction is failed.");
