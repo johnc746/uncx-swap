@@ -265,7 +265,7 @@ const Pair = () => {
 
     return (
         <Container className='d-flex align-items-center justify-content-center'
-            sx={{ height: `${step == "select_pair" ? '100vh' : '140vh'}` }}>
+            sx={{ minHeight: '100vh'}}>
             {step == "select_pair" ?
                 <Box
                     sx={{
