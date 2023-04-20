@@ -12,7 +12,7 @@ const chainList = [
     }
 ]
 
-const Home = () => {
+const SelectDex = () => {
     // const [open, setOpen] = useState(false);
     // const handleOpen = () => setOpen(true);
     // const handleClose = () => setOpen(false);
@@ -328,4 +328,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default SelectDex;
